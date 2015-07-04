@@ -1912,6 +1912,7 @@ NSInteger const SLKAlertViewClearTextTag = 1534347677; // absolute hash of 'SLKT
 {
     UIKeyCommand *command = [UIKeyCommand keyCommandWithInput:@"\r" modifierFlags:0 action:@selector(didPressReturnKey:)];
     
+#ifdef __IPHONE_9_0
     // Only available since iOS9
     if ([UIKeyCommand respondsToSelector:@selector(keyCommandWithInput:modifierFlags:action:discoverabilityTitle:)] ) {
         if (self.textInputbar.isEditing) {
@@ -1921,6 +1922,7 @@ NSInteger const SLKAlertViewClearTextTag = 1534347677; // absolute hash of 'SLKT
             command.discoverabilityTitle = [self.rightButton titleForState:UIControlStateNormal] ? : NSLocalizedString(@"Send", nil);
         }
     }
+#endif
     
     return command;
 }
@@ -1929,6 +1931,7 @@ NSInteger const SLKAlertViewClearTextTag = 1534347677; // absolute hash of 'SLKT
 {
     UIKeyCommand *command = [UIKeyCommand keyCommandWithInput:UIKeyInputEscape modifierFlags:0 action:@selector(didPressEscapeKey:)];
     
+#ifdef __IPHONE_9_0
     // Only available since iOS9
     if ([UIKeyCommand respondsToSelector:@selector(keyCommandWithInput:modifierFlags:action:discoverabilityTitle:)] ) {
         if (self.isAutoCompleting) {
@@ -1941,6 +1944,7 @@ NSInteger const SLKAlertViewClearTextTag = 1534347677; // absolute hash of 'SLKT
             command.discoverabilityTitle = NSLocalizedString(@"Hide Keyboard", nil);
         }
     }
+#endif
     
     return command;
 }
@@ -1948,7 +1952,9 @@ NSInteger const SLKAlertViewClearTextTag = 1534347677; // absolute hash of 'SLKT
 - (UIKeyCommand *)arrowKeyCommand:(NSString *)inputUpArrow
 {
     UIKeyCommand *command = [UIKeyCommand keyCommandWithInput:inputUpArrow modifierFlags:0 action:@selector(didPressArrowKey:)];
-    
+
+#ifdef __IPHONE_9_0
+    // Only available since iOS9
     if ([UIKeyCommand respondsToSelector:@selector(keyCommandWithInput:modifierFlags:action:discoverabilityTitle:)] && self.textView.numberOfLines > 1) {
         if ([inputUpArrow isEqualToString:UIKeyInputUpArrow]) {
             command.discoverabilityTitle = NSLocalizedString(@"Move Up", nil);
@@ -1957,7 +1963,8 @@ NSInteger const SLKAlertViewClearTextTag = 1534347677; // absolute hash of 'SLKT
             command.discoverabilityTitle = NSLocalizedString(@"Move Down", nil);
         }
     }
-    
+#endif
+
     return command;
 }
 
