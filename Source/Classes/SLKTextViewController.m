@@ -1125,8 +1125,10 @@ NSInteger const SLKAlertViewClearTextTag = 1534347677; // absolute hash of 'SLKT
     }
 }
 
-- (void)slk_prepareForInterfaceRotation
+- (void)slk_prepareForInterfaceRotationWithDuration:(NSTimeInterval)duration
 {
+    self.rotating = YES;
+    
     [self.view layoutIfNeeded];
     
     if ([self.textView isFirstResponder]) {
@@ -1135,6 +1137,12 @@ NSInteger const SLKAlertViewClearTextTag = 1534347677; // absolute hash of 'SLKT
     else {
         [self.textView slk_scrollToBottomAnimated:NO];
     }
+    
+    // Disables the flag after the rotation animation is finished
+    // Hacky but works.
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(duration * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        self.rotating = NO;
+    });
 }
 
 
@@ -2035,22 +2043,21 @@ NSInteger const SLKAlertViewClearTextTag = 1534347677; // absolute hash of 'SLKT
 
 #pragma mark - View Auto-Rotation
 
+- (void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator
+{
+    [self slk_prepareForInterfaceRotationWithDuration:coordinator.transitionDuration];
+}
+
 - (void)willRotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration
 {
-    self.rotating = YES;
-    
-    [self slk_prepareForInterfaceRotation];
+    if ([self respondsToSelector:@selector(viewWillTransitionToSize:withTransitionCoordinator:)]) {
+        return;
+    }
+
+    [self slk_prepareForInterfaceRotationWithDuration:duration];
 }
 
-- (void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation
-{
-    // Delays the rotation flag
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.25 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        self.rotating = NO;
-    });
-}
-
-- (UIInterfaceOrientationMask)supportedInterfaceOrientations
+- (NSUInteger)supportedInterfaceOrientations
 {
     return UIInterfaceOrientationMaskAll;
 }
