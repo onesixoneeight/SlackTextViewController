@@ -596,10 +596,7 @@ CGFloat const SLKAutoCompletionViewDefaultHeight = 140.0;
 
 - (BOOL)forceTextInputbarAdjustmentForResponder:(UIResponder *)responder
 {
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-    return self.shouldForceTextInputbarAdjustment;
-#pragma GCC diagnostic pop
+    return NO;
 }
 
 - (BOOL)ignoreTextInputbarAdjustment
@@ -747,11 +744,6 @@ CGFloat const SLKAutoCompletionViewDefaultHeight = 140.0;
     
     // Restores any previous cached text before entering in editing mode
     [self slk_reloadTextView];
-}
-
-- (BOOL)canShowTypeIndicator
-{
-    return [self canShowTypingIndicator];
 }
 
 - (BOOL)canShowTypingIndicator
