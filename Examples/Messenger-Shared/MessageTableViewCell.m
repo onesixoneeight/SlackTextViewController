@@ -7,10 +7,11 @@
 //
 
 #import "MessageTableViewCell.h"
+#import "SLKTextView+SLKAdditions.h"
 
 @implementation MessageTableViewCell
 
-- (id)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier
+- (instancetype)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier
 {
     self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];
     if (self) {
@@ -27,27 +28,28 @@
     [self.contentView addSubview:self.thumbnailView];
     [self.contentView addSubview:self.titleLabel];
     [self.contentView addSubview:self.bodyLabel];
-    [self.contentView addSubview:self.attachmentView];
 
     NSDictionary *views = @{@"thumbnailView": self.thumbnailView,
                             @"titleLabel": self.titleLabel,
                             @"bodyLabel": self.bodyLabel,
-                            @"attachmentView": self.attachmentView,
                             };
     
     NSDictionary *metrics = @{@"tumbSize": @(kMessageTableViewCellAvatarHeight),
                               @"padding": @15,
                               @"right": @10,
-                              @"left": @5,
-                              @"attchSize": @80,
+                              @"left": @5
                               };
     
     [self.contentView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|-left-[thumbnailView(tumbSize)]-right-[titleLabel(>=0)]-right-|" options:0 metrics:metrics views:views]];
     [self.contentView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|-left-[thumbnailView(tumbSize)]-right-[bodyLabel(>=0)]-right-|" options:0 metrics:metrics views:views]];
-    [self.contentView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|-left-[thumbnailView(tumbSize)]-right-[attachmentView]-right-|" options:0 metrics:metrics views:views]];
-
     [self.contentView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|-right-[thumbnailView(tumbSize)]-(>=0)-|" options:0 metrics:metrics views:views]];
-    [self.contentView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|-padding-[titleLabel]-left-[bodyLabel(>=0)]-left-[attachmentView(>=0,<=attchSize)]-right-|" options:0 metrics:metrics views:views]];
+    
+    if ([self.reuseIdentifier isEqualToString:MessengerCellIdentifier]) {
+        [self.contentView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|-right-[titleLabel(20)]-left-[bodyLabel(>=0@999)]-left-|" options:0 metrics:metrics views:views]];
+    }
+    else {
+        [self.contentView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[titleLabel]|" options:0 metrics:metrics views:views]];
+    }
 }
 
 - (void)prepareForReuse
@@ -56,9 +58,14 @@
     
     self.selectionStyle = UITableViewCellSelectionStyleNone;
     
-    self.titleLabel.font = [UIFont boldSystemFontOfSize:16.0];
-    self.bodyLabel.font = [UIFont systemFontOfSize:16.0];
-    self.attachmentView.image = nil;
+    CGFloat pointSize = [MessageTableViewCell defaultFontSize];
+    
+    self.titleLabel.font = [UIFont boldSystemFontOfSize:pointSize];
+    self.bodyLabel.font = [UIFont systemFontOfSize:pointSize];
+    
+    self.titleLabel.text = @"";
+    self.bodyLabel.text = @"";
+
 }
 
 #pragma mark - Getters
@@ -71,9 +78,8 @@
         _titleLabel.backgroundColor = [UIColor clearColor];
         _titleLabel.userInteractionEnabled = NO;
         _titleLabel.numberOfLines = 0;
-
-        _titleLabel.font = [UIFont boldSystemFontOfSize:16.0];
         _titleLabel.textColor = [UIColor grayColor];
+        _titleLabel.font = [UIFont boldSystemFontOfSize:[MessageTableViewCell defaultFontSize]];
     }
     return _titleLabel;
 }
@@ -86,9 +92,8 @@
         _bodyLabel.backgroundColor = [UIColor clearColor];
         _bodyLabel.userInteractionEnabled = NO;
         _bodyLabel.numberOfLines = 0;
-        
-        _bodyLabel.font = [UIFont systemFontOfSize:16.0];
         _bodyLabel.textColor = [UIColor darkGrayColor];
+        _bodyLabel.font = [UIFont systemFontOfSize:[MessageTableViewCell defaultFontSize]];
     }
     return _bodyLabel;
 }
@@ -107,24 +112,14 @@
     return _thumbnailView;
 }
 
-- (UIImageView *)attachmentView
++ (CGFloat)defaultFontSize
 {
-    if (!_attachmentView) {
-        _attachmentView = [UIImageView new];
-        _attachmentView.translatesAutoresizingMaskIntoConstraints = NO;
-        _attachmentView.userInteractionEnabled = NO;
-        _attachmentView.backgroundColor = [UIColor clearColor];
-        _attachmentView.contentMode = UIViewContentModeCenter;
-        
-        _attachmentView.layer.cornerRadius = kMessageTableViewCellAvatarHeight/4.0;
-        _attachmentView.layer.masksToBounds = YES;
-    }
-    return _attachmentView;
-}
-
-- (BOOL)needsPlaceholder
-{
-    return self.thumbnailView.image ? NO : YES;
+    CGFloat pointSize = 16.0;
+    
+    NSString *contentSizeCategory = [[UIApplication sharedApplication] preferredContentSizeCategory];
+    pointSize += [SLKTextView pointSizeDifferenceForCategory:contentSizeCategory];
+    
+    return pointSize;
 }
 
 @end

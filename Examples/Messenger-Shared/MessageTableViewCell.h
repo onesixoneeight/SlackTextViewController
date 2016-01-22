@@ -11,16 +11,19 @@
 static CGFloat kMessageTableViewCellMinimumHeight = 50.0;
 static CGFloat kMessageTableViewCellAvatarHeight = 30.0;
 
+static NSString *MessengerCellIdentifier = @"MessengerCell";
+static NSString *AutoCompletionCellIdentifier = @"AutoCompletionCell";
+
 @interface MessageTableViewCell : UITableViewCell
 
 @property (nonatomic, strong) UILabel *titleLabel;
 @property (nonatomic, strong) UILabel *bodyLabel;
 @property (nonatomic, strong) UIImageView *thumbnailView;
-@property (nonatomic, strong) UIImageView *attachmentView;
 
 @property (nonatomic, strong) NSIndexPath *indexPath;
 
-@property (nonatomic, readonly) BOOL needsPlaceholder;
 @property (nonatomic) BOOL usedForMessage;
+
++ (CGFloat)defaultFontSize;
 
 @end
